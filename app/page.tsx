@@ -1,69 +1,25 @@
-import Image from "next/image";
+const Arrow = () => <span aria-hidden="true">→</span>;
 
-export default function Home() {
-  return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
-  );
+const categories = [["♡", "Wedding", "Timeless celebrations of love"], ["✦", "Engagement", "The beginning of forever"], ["✧", "Save the Date", "A date worth remembering"], ["☼", "Birthday", "Joyful, personal, unforgettable"], ["❋", "Baby Shower", "Sweet beginnings, beautifully shared"], ["⌂", "Housewarming", "A warm welcome home"]];
+const templates = [{ name: "Elysian Garden", type: "Wedding invitation", price: "₹899", className: "garden" }, { name: "Velvet Vows", type: "Wedding invitation", price: "₹999", className: "velvet" }, { name: "Saffron Soirée", type: "Engagement invitation", price: "₹799", className: "saffron" }];
+const steps = [["01", "Choose a template", "Find a design that feels like you, from modern minimal to beautifully ornate."], ["02", "Add your details", "Share every important moment, date and location in just a few thoughtful fields."], ["03", "Personalize", "Make it entirely yours with colours, photos, music and the little details guests love."], ["04", "Share your invitation", "Send a beautiful link to everyone you love, wherever they are."]];
+const features = [["◷", "Countdown", "Build anticipation right up to your day."], ["♫", "Background music", "Set the mood from the very first tap."], ["▧", "Photo gallery", "Share the moments that brought you here."], ["⌖", "Google Maps", "Help every guest arrive with ease."], ["✉", "RSVP", "Keep your guest list wonderfully simple."], ["◌", "WhatsApp sharing", "Send your celebration straight to their chat."]];
+
+function SectionHeading({ eyebrow, title, copy }: { eyebrow: string; title: string; copy?: string }) { return <div className="section-heading"><p className="eyebrow">{eyebrow}</p><h2>{title}</h2>{copy && <p className="section-copy">{copy}</p>}</div>; }
+function FloralMark() { return <span className="floral-mark" aria-hidden="true">❧</span>; }
+function InvitationPreview({ variant = "hero" }: { variant?: "hero" | "garden" | "velvet" | "saffron" }) {
+  if (variant !== "hero") { const content = variant === "velvet" ? ["Rhea", "&", "Arjun", "Together with their families"] : variant === "saffron" ? ["Amara", "&", "Nikhil", "A celebration of love"] : ["Anika", "&", "Veer", "Together with their families"]; return <div className={`template-art ${variant}`}><div className="art-ornament">✦</div><p>{content[3]}</p><strong>{content[0]}<i>{content[1]}</i>{content[2]}</strong><small>11 · 01 · 2026</small><div className="art-flower">❀</div></div>; }
+  return <div className="hero-preview" aria-label="Example wedding invitation"><div className="preview-shadow" /><div className="preview-paper"><div className="paper-top"><FloralMark /><span>Save the date</span><FloralMark /></div><p className="preview-intro">Together with their families</p><h3>Rhea <em>&</em> Arjun</h3><div className="paper-divider">✦</div><p className="preview-date">Saturday, 14 February 2026</p><p className="preview-place">The Oberoi, Udaipur</p><div className="preview-botanicals"><span>❀</span><span>✾</span><span>❀</span></div></div><div className="preview-note">crafted for your<br />one-of-a-kind day <Arrow /></div></div>;
 }
+
+export default function Home() { return <main>
+  <nav className="navbar" aria-label="Primary navigation"><a className="logo" href="#top"><span className="logo-mark">A</span><span>AMORA<small>INVITATIONS</small></span></a><div className="nav-links"><a href="#top">Home</a><a href="#templates">Templates</a><a href="#how-it-works">How It Works</a><a href="#pricing">Pricing</a><a href="#contact">Contact</a></div><a className="button button-small" href="#templates">Explore templates <Arrow /></a></nav>
+  <section className="hero" id="top"><div className="hero-copy"><p className="eyebrow">Invitations, thoughtfully made</p><h1>Beautiful Invitations<br />for Life&apos;s <em>Beautiful</em> Moments</h1><p className="hero-text">Turn your most cherished occasion into a digital experience your guests will remember — elegant, personal, and entirely yours.</p><div className="hero-actions"><a className="button" href="#templates">Explore templates <Arrow /></a><a className="text-link" href="#how-it-works">How it works <span>↓</span></a></div><div className="hero-proof"><div className="avatar-row"><b>R</b><b>A</b><b>S</b><b>N</b></div><span>Loved by <strong>5,000+</strong> couples & families</span></div></div><InvitationPreview /><div className="hero-dots" aria-hidden="true" /></section>
+  <section className="categories section-pad"><SectionHeading eyebrow="Celebrate every chapter" title="For every beautiful occasion" copy="Thoughtfully designed invitations for the moments that bring people together." /><div className="category-grid">{categories.map(([icon, title, copy]) => <a href="#templates" className="category-card" key={title}><span className="category-icon">{icon}</span><h3>{title}</h3><p>{copy}</p><span className="card-arrow"><Arrow /></span></a>)}</div></section>
+  <section className="featured section-pad" id="templates"><div className="feature-header"><SectionHeading eyebrow="Made for your moment" title="Featured invitations" copy="A glimpse of our most-loved ways to make an entrance." /><a className="text-link" href="#pricing">View all templates <Arrow /></a></div><div className="template-grid">{templates.map((template) => <article className="template-card" key={template.name}><InvitationPreview variant={template.className as "garden" | "velvet" | "saffron"} /><div className="template-info"><div><p>{template.type}</p><h3>{template.name}</h3></div><span>{template.price}</span></div><a href={template.name === "Velvet Vows" ? "/templates/velvet-vows" : "#pricing"} className="view-template">View template <Arrow /></a></article>)}</div></section>
+  <section className="process section-pad" id="how-it-works"><div className="process-image"><div className="process-card"><p>A celebration awaits</p><strong>Save<br />our<br /><em>date</em></strong><span>♡</span></div><div className="process-flower">❀</div></div><div className="process-content"><SectionHeading eyebrow="Simple by design" title="A beautiful invitation, in four lovely steps" copy="Creating something unforgettable should feel effortless." /><div className="steps">{steps.map(([num, title, copy]) => <div className="step" key={num}><span>{num}</span><div><h3>{title}</h3><p>{copy}</p></div></div>)}</div></div></section>
+  <section className="features section-pad"><SectionHeading eyebrow="More than an invitation" title="Every detail, beautifully considered" copy="Everything you need to turn an invite into an experience." /><div className="feature-grid">{features.map(([icon, title, copy]) => <div className="feature-item" key={title}><span>{icon}</span><h3>{title}</h3><p>{copy}</p></div>)}</div></section>
+  <section className="why section-pad"><div className="why-copy"><SectionHeading eyebrow="The Amora difference" title="Made to be felt, not just seen" copy="Your invitation is the first chapter of your celebration. We believe it deserves the same care as every moment that follows." /><div className="why-points"><p><span>✦</span>Designed with timeless elegance</p><p><span>✦</span>Effortless to personalize</p><p><span>✦</span>Beautiful on every screen</p></div></div><div className="why-art"><div className="arch"><span>✦</span><p>for all the<br /><em>love stories</em></p><div>∞</div></div><span className="art-caption">a little beauty<br />goes a long way</span></div></section>
+  <section className="cta" id="pricing"><div className="cta-spark left">✦</div><div><p className="eyebrow">Your story starts here</p><h2>Ready to make<br />something <em>beautiful?</em></h2><p>Choose a design that feels like the beginning of your celebration.</p><a className="button button-light" href="#templates">Explore templates <Arrow /></a></div><div className="cta-spark right">❋</div></section>
+  <footer id="contact"><div className="footer-main"><a className="logo footer-logo" href="#top"><span className="logo-mark">A</span><span>AMORA<small>INVITATIONS</small></span></a><p>Thoughtful digital invitations<br />for beautiful celebrations.</p><div className="footer-links"><a href="#templates">Templates</a><a href="#how-it-works">How it works</a><a href="#pricing">Pricing</a><a href="mailto:hello@amora.studio">Contact</a></div><div className="socials"><a href="#top" aria-label="Instagram">ig</a><a href="#top" aria-label="Pinterest">p</a><a href="#top" aria-label="Facebook">f</a></div></div><div className="footer-bottom"><span>© 2026 Amora Invitations. Made with care.</span><span>Privacy &nbsp;&nbsp; Terms</span></div></footer>
+</main>; }
