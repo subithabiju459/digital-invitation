@@ -24,6 +24,36 @@ type FormFields = {
   rsvp: string;
 };
 
+type SupabaseErrorLike = {
+  message?: unknown;
+  code?: unknown;
+  details?: unknown;
+  hint?: unknown;
+  statusCode?: unknown;
+};
+
+class InvitationSaveError extends Error {}
+
+function safeErrorText(value: unknown) {
+  if (typeof value !== "string") return undefined;
+  return value
+    .replace(/bearer\s+[^\s,;]+/gi, "Bearer [redacted]")
+    .replace(/(api[_-]?key|authorization|secret|token)\s*[:=]\s*[^\s,;]+/gi, "$1=[redacted]")
+    .slice(0, 500);
+}
+
+function logSupabaseFailure(operation: "storage-upload" | "database-insert" | "storage-cleanup", error: unknown) {
+  const failure = error as SupabaseErrorLike;
+  console.error("Supabase invitation save failure", {
+    operation,
+    message: safeErrorText(failure?.message),
+    code: typeof failure?.code === "string" || typeof failure?.code === "number" ? failure.code : undefined,
+    details: safeErrorText(failure?.details),
+    hint: safeErrorText(failure?.hint),
+    statusCode: typeof failure?.statusCode === "number" ? failure.statusCode : undefined,
+  });
+}
+
 const text = (value: FormDataEntryValue | null, maxLength: number) =>
   typeof value === "string" ? value.trim().slice(0, maxLength) : "";
 
@@ -87,10 +117,11 @@ export async function POST(request: Request) {
       const path = `${slug}/${kind}-${crypto.randomUUID()}.${extension}`;
       const { error } = await supabase.storage.from(BUCKET).upload(path, file, { contentType: file.type, upsert: false });
       if (error) {
+        logSupabaseFailure("storage-upload", error);
         const message = error.message.toLowerCase().includes("bucket not found")
           ? "Image storage is not configured yet. Please contact the site owner."
           : "We could not upload one of your images. Please try again.";
-        throw new Error(message);
+        throw new InvitationSaveError(message);
       }
       uploadedPaths.push(path);
       return supabase.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
@@ -105,14 +136,23 @@ export async function POST(request: Request) {
         galleryUrls.push(await upload(file, `gallery-${index + 1}`));
       }
       const { error } = await supabase.from("invitations").insert({ slug, bride_name: fields.bride, groom_name: fields.groom, wedding_date: fields.date, wedding_time: fields.time, venue_name: fields.venue, venue_address: fields.address, maps_url: fields.maps, welcome_message: fields.welcome, story: fields.story, rsvp_phone: fields.rsvp, cover_photo_url: coverUrl || null, bride_photo_url: brideUrl || null, groom_photo_url: groomUrl || null, gallery_urls: galleryUrls, template_id: "velvet-vows", status: "draft" });
-      if (error) throw new Error("We could not save your invitation. Please try again.");
+      if (error) {
+        logSupabaseFailure("database-insert", error);
+        throw new InvitationSaveError("We could not save your invitation. Please try again.");
+      }
     } catch (error) {
-      if (uploadedPaths.length) await supabase.storage.from(BUCKET).remove(uploadedPaths);
+      if (uploadedPaths.length) {
+        const { error: cleanupError } = await supabase.storage.from(BUCKET).remove(uploadedPaths);
+        if (cleanupError) logSupabaseFailure("storage-cleanup", cleanupError);
+      }
       throw error;
     }
     return NextResponse.json({ slug }, { status: 201 });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "We could not save your invitation. Please try again.";
+    if (!(error instanceof InvitationSaveError)) {
+      logSupabaseFailure("database-insert", error);
+    }
+    const message = error instanceof InvitationSaveError ? error.message : "We could not save your invitation. Please try again.";
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
