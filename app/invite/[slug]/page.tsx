@@ -1,5 +1,7 @@
 import { notFound } from "next/navigation";
+import { connection } from "next/server";
 import { createAdminClient } from "@/utils/supabase/admin";
+import { isInvitationExpired } from "@/lib/invitation-expiry";
 import VelvetVowsInvitation, {
   type VelvetVowsDetails,
   type VelvetVowsPhotos,
@@ -10,6 +12,8 @@ export default async function InvitationPage({
 }: {
   params: Promise<{ slug: string }>;
 }) {
+  // The expiry check must run at request time, never from a cached page or client clock.
+  await connection();
   const { slug } = await params;
   const supabase = createAdminClient();
   const { data, error } = await supabase
@@ -20,6 +24,9 @@ export default async function InvitationPage({
     .single();
 
   if (error || !data) notFound();
+  if (isInvitationExpired(data.wedding_date, data.wedding_time)) {
+    return <ExpiredInvitation />;
+  }
 
   const gallery = Array.isArray(data.gallery_urls)
     ? data.gallery_urls.filter((url): url is string => typeof url === "string")
@@ -44,4 +51,15 @@ export default async function InvitationPage({
   };
 
   return <VelvetVowsInvitation invitation={{ details, photos }} />;
+}
+
+function ExpiredInvitation() {
+  return <main className="invite-expired">
+    <div className="invite-expired-card">
+      <span aria-hidden="true">✦</span>
+      <p>This invitation is no longer available</p>
+      <small>Its sharing period has ended.</small>
+      <a href="/">Return to AMORA</a>
+    </div>
+  </main>;
 }
