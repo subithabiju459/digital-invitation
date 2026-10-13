@@ -1,7 +1,9 @@
+import { templatePricing } from "@/lib/template-pricing";
+
 const Arrow = () => <span aria-hidden="true">→</span>;
 
 const categories = [["♡", "Wedding", "Timeless celebrations of love"], ["✦", "Engagement", "The beginning of forever"], ["✧", "Save the Date", "A date worth remembering"], ["☼", "Birthday", "Joyful, personal, unforgettable"], ["❋", "Baby Shower", "Sweet beginnings, beautifully shared"], ["⌂", "Housewarming", "A warm welcome home"]];
-const templates = [{ name: "Elysian Garden", type: "Wedding invitation", price: "₹899", className: "garden" }, { name: "Velvet Vows", type: "Wedding invitation", price: "₹999", className: "velvet" }, { name: "Saffron Soirée", type: "Engagement invitation", price: "₹799", className: "saffron" }];
+const templates = [{ name: "Elysian Garden", type: "Wedding invitation", price: "₹899", className: "garden" }, { name: "Velvet Vows", type: "Wedding invitation", price: `₹${templatePricing["velvet-vows"].amount}`, className: "velvet" }, { name: "Saffron Soirée", type: "Engagement invitation", price: "₹799", className: "saffron" }];
 const steps = [["01", "Choose a template", "Find a design that feels like you, from modern minimal to beautifully ornate."], ["02", "Add your details", "Share every important moment, date and location in just a few thoughtful fields."], ["03", "Personalize", "Make it entirely yours with colours, photos, music and the little details guests love."], ["04", "Share your invitation", "Send a beautiful link to everyone you love, wherever they are."]];
 const features = [["◷", "Countdown", "Build anticipation right up to your day."], ["♫", "Background music", "Set the mood from the very first tap."], ["▧", "Photo gallery", "Share the moments that brought you here."], ["⌖", "Google Maps", "Help every guest arrive with ease."], ["✉", "RSVP", "Keep your guest list wonderfully simple."], ["◌", "WhatsApp sharing", "Send your celebration straight to their chat."]];
 

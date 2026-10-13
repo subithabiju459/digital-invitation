@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { PayAndPublish } from "@/app/_components/pay-and-publish";
 
 const defaults = { bride: "Rhea", groom: "Arjun", date: "2027-01-16", time: "17:30", venue: "The Oberoi Udaivilas", address: "Haridasji Ki Magri, Udaipur, Rajasthan 313001", maps: "https://maps.google.com/?q=The+Oberoi+Udaivilas+Udaipur", welcome: "together with their families", story: "What began with an unexpected conversation over coffee became a thousand shared sunsets, a few grand adventures, and a love that feels like home.", rsvp: "rheaandarjun@example.com" };
 export type VelvetVowsDetails = typeof defaults;
@@ -27,7 +28,7 @@ function Countdown({ targetDate }: { targetDate: string }) {
 
 function Ornament() { return <span className="vv-ornament" aria-hidden="true">✦</span>; }
 
-export function VelvetVowsInvitation({ invitation, privatePreview = false }: { invitation?: SavedInvitation; privatePreview?: boolean }) {
+export function VelvetVowsInvitation({ invitation, privatePreview = false, paymentInvitationSlug }: { invitation?: SavedInvitation; privatePreview?: boolean; paymentInvitationSlug?: string }) {
   const [musicPlaying, setMusicPlaying] = useState(false);
   const [details, setDetails] = useState<VelvetVowsDetails>(invitation?.details ?? defaults);
   const [photos, setPhotos] = useState<VelvetVowsPhotos>(invitation?.photos ?? emptyPhotos);
@@ -38,6 +39,7 @@ export function VelvetVowsInvitation({ invitation, privatePreview = false }: { i
     <button className={`vv-music ${musicPlaying ? "is-playing" : ""}`} onClick={() => setMusicPlaying(!musicPlaying)} aria-pressed={musicPlaying}><span>{musicPlaying ? "Ⅱ" : "♪"}</span>{musicPlaying ? "Music on" : "Play music"}</button>
     <a className="vv-home" href="/" aria-label="Back to Amora homepage">A</a>
     {!privatePreview && <a className="vv-customize" href="/templates/velvet-vows/customize">Customize This Invitation <span>→</span></a>}
+    {privatePreview && paymentInvitationSlug && <PayAndPublish slug={paymentInvitationSlug} />}
 
     <section className="vv-hero">
       <div className={`vv-hero-frame ${photos.cover ? "has-cover" : ""}`}>{photos.cover && <img className="vv-hero-cover" src={photos.cover} alt={`${details.bride} and ${details.groom}`} />}<div className="vv-corner top-left">❧</div><div className="vv-corner top-right">❧</div><p className="vv-script">{details.welcome}</p><p className="vv-kicker">We&apos;re getting married</p><h1>{details.bride} <em>&</em> {details.groom}</h1><Ornament /><p className="vv-date">{formatDate(details.date)} · {details.time}</p><p className="vv-place">{details.venue}</p><a href="#celebrate" className="vv-scroll">Scroll to celebrate <span>↓</span></a><div className="vv-corner bottom-left">❀</div><div className="vv-corner bottom-right">❀</div></div>

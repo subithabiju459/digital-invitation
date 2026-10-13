@@ -60,7 +60,7 @@ export default async function DraftPreviewPage({ params }: { params: Promise<{ s
     gallery,
   };
 
-  return <VelvetVowsInvitation invitation={{ details, photos }} privatePreview />;
+  return <VelvetVowsInvitation invitation={{ details, photos }} privatePreview paymentInvitationSlug={data.slug} />;
 }
 
 function ExpiredPreview() {
