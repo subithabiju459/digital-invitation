@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import { draftPreviewAccess } from "@/lib/invitation-access";
-import { PREVIEW_TOKEN_TTL_SECONDS, previewCookieName } from "@/lib/draft-preview";
+import {
+  paymentPreviewCookieName,
+  PREVIEW_TOKEN_TTL_SECONDS,
+  previewCookieName,
+  previewCookiePaths,
+} from "@/lib/draft-preview";
 import { createAdminClient } from "@/utils/supabase/admin";
 
 const WINDOW_MS = 10 * 60 * 1000;
@@ -60,11 +65,19 @@ export async function POST(request: Request) {
     if (access !== "available") return privateJson({ error: "This preview link is unavailable." }, 401);
 
     const response = privateJson({ previewPath: `/preview/${data.slug}` });
+    const paths = previewCookiePaths(data.slug);
     response.cookies.set(previewCookieName(data.slug), body.token, {
       httpOnly: true,
       sameSite: "strict",
       secure: process.env.NODE_ENV === "production",
-      path: `/preview/${data.slug}`,
+      path: paths.preview,
+      maxAge: PREVIEW_TOKEN_TTL_SECONDS,
+    });
+    response.cookies.set(paymentPreviewCookieName(data.slug), body.token, {
+      httpOnly: true,
+      sameSite: "strict",
+      secure: process.env.NODE_ENV === "production",
+      path: paths.payment,
       maxAge: PREVIEW_TOKEN_TTL_SECONDS,
     });
     return response;

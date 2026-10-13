@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { createCashfreeOrder } from "@/lib/cashfree.server";
 import { draftPreviewAccess } from "@/lib/invitation-access";
-import { previewCookieName } from "@/lib/draft-preview";
+import { paymentPreviewCookieName } from "@/lib/draft-preview";
 import { getTemplatePrice } from "@/lib/template-pricing";
 import { createAdminClient } from "@/utils/supabase/admin";
 
@@ -26,7 +26,9 @@ export async function POST(request: NextRequest) {
     const body = await request.json() as { slug?: unknown };
     if (typeof body.slug !== "string" || body.slug.length > 180) return response({ error: "This preview is unavailable." }, 401);
 
-    const token = (await cookies()).get(previewCookieName(body.slug))?.value;
+    // Set only after successful preview authorization and scoped to
+    // /api/payments so it is not sent to unrelated application routes.
+    const token = (await cookies()).get(paymentPreviewCookieName(body.slug))?.value;
     const supabase = createAdminClient();
     const { data: invitation, error: invitationError } = await supabase
       .from("invitations")

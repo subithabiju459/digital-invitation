@@ -36,3 +36,17 @@ export function isPreviewTokenExpired(expiresAt: unknown, now = Date.now()) {
 export function previewCookieName(slug: string) {
   return `amora_preview_${createHash("sha256").update(slug).digest("hex").slice(0, 24)}`;
 }
+
+// Keep payment authorization separate from the preview-page cookie. This
+// allows a browser to send it only to the payment API instead of giving a
+// preview credential site-wide scope.
+export function paymentPreviewCookieName(slug: string) {
+  return `amora_payment_preview_${createHash("sha256").update(slug).digest("hex").slice(0, 24)}`;
+}
+
+export function previewCookiePaths(slug: string) {
+  return {
+    preview: `/preview/${slug}`,
+    payment: "/api/payments",
+  };
+}
