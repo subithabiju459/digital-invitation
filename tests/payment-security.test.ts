@@ -7,10 +7,30 @@ import { cashfreeWebhookSignature, cashfreeWebhookSignatureMatches } from "../li
 import { verifiedCashfreePayment } from "../lib/payment-verification.ts";
 // @ts-expect-error Node's native TypeScript test runner requires explicit local extensions at runtime.
 import { getTemplatePrice } from "../lib/template-pricing.ts";
+// @ts-expect-error Node's native TypeScript test runner requires explicit local extensions at runtime.
+import { paymentInsertPayload } from "../lib/payment-record.ts";
 
 test("Velvet Vows price is supplied by the server-side template catalogue", () => {
   assert.deepEqual(getTemplatePrice("velvet-vows"), { amount: 999, currency: "INR" });
   assert.equal(getTemplatePrice("browser-supplied-price"), null);
+});
+
+test("the payment insert payload satisfies the migration's required server-owned fields", () => {
+  assert.deepEqual(paymentInsertPayload({
+    invitationId: 42,
+    orderId: "amora_0123456789abcdef0123456789abcdef",
+    templateId: "velvet-vows",
+    amount: 999,
+    currency: "INR",
+  }), {
+    invitation_id: 42,
+    order_id: "amora_0123456789abcdef0123456789abcdef",
+    provider: "cashfree",
+    template_id: "velvet-vows",
+    amount: 999,
+    currency: "INR",
+    status: "created",
+  });
 });
 
 test("only a paid Cashfree order with a matching successful payment is verified", () => {
