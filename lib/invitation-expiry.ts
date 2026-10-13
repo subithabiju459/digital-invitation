@@ -7,10 +7,12 @@ type DateTimeParts = {
   day: number;
   hour: number;
   minute: number;
+  second: number;
 };
 
 const datePattern = /^(\d{4})-(\d{2})-(\d{2})$/;
-const timePattern = /^(\d{2}):(\d{2})$/;
+// HTML time inputs submit HH:mm; PostgreSQL time values are returned as HH:mm:ss.
+const timePattern = /^(\d{2}):(\d{2})(?::(\d{2}))?$/;
 
 function parseEventDateTime(date: string, time: string): DateTimeParts | null {
   const dateMatch = datePattern.exec(date);
@@ -23,13 +25,15 @@ function parseEventDateTime(date: string, time: string): DateTimeParts | null {
     day: Number(dateMatch[3]),
     hour: Number(timeMatch[1]),
     minute: Number(timeMatch[2]),
+    second: Number(timeMatch[3] ?? 0),
   };
-  const candidate = new Date(Date.UTC(parts.year, parts.month - 1, parts.day, parts.hour, parts.minute));
+  const candidate = new Date(Date.UTC(parts.year, parts.month - 1, parts.day, parts.hour, parts.minute, parts.second));
   const isRealDate = candidate.getUTCFullYear() === parts.year
     && candidate.getUTCMonth() === parts.month - 1
     && candidate.getUTCDate() === parts.day
     && parts.hour <= 23
-    && parts.minute <= 59;
+    && parts.minute <= 59
+    && parts.second <= 59;
 
   return isRealDate ? parts : null;
 }
@@ -47,19 +51,20 @@ function getOffsetMilliseconds(timestamp: number, timeZone: string) {
 }
 
 function zonedDateTimeToTimestamp(parts: DateTimeParts, timeZone: string) {
-  const asUtc = Date.UTC(parts.year, parts.month - 1, parts.day, parts.hour, parts.minute);
+  const asUtc = Date.UTC(parts.year, parts.month - 1, parts.day, parts.hour, parts.minute, parts.second);
   const initialTimestamp = asUtc - getOffsetMilliseconds(asUtc, timeZone);
   return asUtc - getOffsetMilliseconds(initialTimestamp, timeZone);
 }
 
 function addCalendarDays(parts: DateTimeParts, days: number): DateTimeParts {
-  const shifted = new Date(Date.UTC(parts.year, parts.month - 1, parts.day + days, parts.hour, parts.minute));
+  const shifted = new Date(Date.UTC(parts.year, parts.month - 1, parts.day + days, parts.hour, parts.minute, parts.second));
   return {
     year: shifted.getUTCFullYear(),
     month: shifted.getUTCMonth() + 1,
     day: shifted.getUTCDate(),
     hour: shifted.getUTCHours(),
     minute: shifted.getUTCMinutes(),
+    second: shifted.getUTCSeconds(),
   };
 }
 

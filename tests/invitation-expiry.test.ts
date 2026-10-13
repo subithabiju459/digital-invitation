@@ -20,3 +20,10 @@ test("an invitation remains unavailable after its expiry", () => {
   assert.notEqual(expiry, null);
   assert.equal(isInvitationExpired("2026-10-13", "17:30", expiry! + 1), true);
 });
+
+test("a PostgreSQL-normalized HH:mm:ss wedding time keeps a future invitation available", () => {
+  const storedTime = "17:30:00";
+  const futureExpiry = invitationExpiryAt("2027-01-16", storedTime);
+  assert.notEqual(futureExpiry, null);
+  assert.equal(isInvitationExpired("2027-01-16", storedTime, Date.UTC(2026, 9, 13, 12, 0, 0)), false);
+});

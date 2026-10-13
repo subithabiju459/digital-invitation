@@ -26,6 +26,10 @@ test("a valid preview token authorizes its matching draft", () => {
   assert.equal(draftPreviewAccess(previewData, token, now), "available");
 });
 
+test("a valid preview token remains authorized when Supabase returns wedding_time with seconds", () => {
+  assert.equal(draftPreviewAccess({ ...previewData, weddingTime: "17:30:00" }, token, now), "available");
+});
+
 test("an invalid preview token cannot authorize a draft", () => {
   assert.equal(draftPreviewAccess(previewData, createPreviewToken(), now), "unavailable");
 });
