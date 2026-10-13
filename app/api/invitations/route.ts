@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { createPreviewToken, hashPreviewToken, previewTokenExpiresAt } from "@/lib/draft-preview";
 import { createAdminClient } from "@/utils/supabase/admin";
 
 const BUCKET = "invitation-images";
@@ -105,6 +106,9 @@ export async function POST(request: Request) {
     if (imageError) return NextResponse.json({ error: imageError }, { status: 400 });
 
     const slug = makeSlug(fields.bride, fields.groom);
+    const previewToken = createPreviewToken();
+    const previewTokenHash = hashPreviewToken(previewToken);
+    const previewTokenExpiry = previewTokenExpiresAt();
     const supabase = createAdminClient();
     const uploadedPaths: string[] = [];
     const upload = async (file: File | null, kind: string) => {
@@ -131,7 +135,7 @@ export async function POST(request: Request) {
       for (const [index, file] of galleryFiles.entries()) {
         galleryUrls.push(await upload(file, `gallery-${index + 1}`));
       }
-      const { error } = await supabase.from("invitations").insert({ slug, bride_name: fields.bride, groom_name: fields.groom, wedding_date: fields.date, wedding_time: fields.time, venue_name: fields.venue, venue_address: fields.address, maps_url: fields.maps, welcome_message: fields.welcome, story: fields.story, rsvp_phone: fields.rsvp, cover_photo_url: coverUrl || null, bride_photo_url: brideUrl || null, groom_photo_url: groomUrl || null, gallery_urls: galleryUrls, template_id: "velvet-vows", status: "draft" });
+      const { error } = await supabase.from("invitations").insert({ slug, bride_name: fields.bride, groom_name: fields.groom, wedding_date: fields.date, wedding_time: fields.time, venue_name: fields.venue, venue_address: fields.address, maps_url: fields.maps, welcome_message: fields.welcome, story: fields.story, rsvp_phone: fields.rsvp, cover_photo_url: coverUrl || null, bride_photo_url: brideUrl || null, groom_photo_url: groomUrl || null, gallery_urls: galleryUrls, template_id: "velvet-vows", status: "draft", preview_token_hash: previewTokenHash, preview_token_expires_at: previewTokenExpiry });
       if (error) {
         logSupabaseFailure(error);
         throw new InvitationSaveError("We could not save your invitation. Please try again.");
@@ -143,7 +147,7 @@ export async function POST(request: Request) {
       }
       throw error;
     }
-    return NextResponse.json({ slug }, { status: 201 });
+    return NextResponse.json({ slug, previewToken }, { status: 201, headers: { "Cache-Control": "no-store, private, max-age=0", "Referrer-Policy": "no-referrer" } });
   } catch (error) {
     if (!(error instanceof InvitationSaveError)) {
       logSupabaseFailure(error);

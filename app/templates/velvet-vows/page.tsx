@@ -27,7 +27,7 @@ function Countdown({ targetDate }: { targetDate: string }) {
 
 function Ornament() { return <span className="vv-ornament" aria-hidden="true">✦</span>; }
 
-export function VelvetVowsInvitation({ invitation }: { invitation?: SavedInvitation }) {
+export function VelvetVowsInvitation({ invitation, privatePreview = false }: { invitation?: SavedInvitation; privatePreview?: boolean }) {
   const [musicPlaying, setMusicPlaying] = useState(false);
   const [details, setDetails] = useState<VelvetVowsDetails>(invitation?.details ?? defaults);
   const [photos, setPhotos] = useState<VelvetVowsPhotos>(invitation?.photos ?? emptyPhotos);
@@ -37,7 +37,7 @@ export function VelvetVowsInvitation({ invitation }: { invitation?: SavedInvitat
   return <main className="velvet-page">
     <button className={`vv-music ${musicPlaying ? "is-playing" : ""}`} onClick={() => setMusicPlaying(!musicPlaying)} aria-pressed={musicPlaying}><span>{musicPlaying ? "Ⅱ" : "♪"}</span>{musicPlaying ? "Music on" : "Play music"}</button>
     <a className="vv-home" href="/" aria-label="Back to Amora homepage">A</a>
-    <a className="vv-customize" href="/templates/velvet-vows/customize">Customize This Invitation <span>→</span></a>
+    {!privatePreview && <a className="vv-customize" href="/templates/velvet-vows/customize">Customize This Invitation <span>→</span></a>}
 
     <section className="vv-hero">
       <div className={`vv-hero-frame ${photos.cover ? "has-cover" : ""}`}>{photos.cover && <img className="vv-hero-cover" src={photos.cover} alt={`${details.bride} and ${details.groom}`} />}<div className="vv-corner top-left">❧</div><div className="vv-corner top-right">❧</div><p className="vv-script">{details.welcome}</p><p className="vv-kicker">We&apos;re getting married</p><h1>{details.bride} <em>&</em> {details.groom}</h1><Ornament /><p className="vv-date">{formatDate(details.date)} · {details.time}</p><p className="vv-place">{details.venue}</p><a href="#celebrate" className="vv-scroll">Scroll to celebrate <span>↓</span></a><div className="vv-corner bottom-left">❀</div><div className="vv-corner bottom-right">❀</div></div>
@@ -53,7 +53,7 @@ export function VelvetVowsInvitation({ invitation }: { invitation?: SavedInvitat
 
     <section className="vv-gallery"><div className="vv-gallery-title"><p className="vv-overline">A few favourite moments</p><h2>Our little<br /><em>love archive</em></h2></div><div className="vv-gallery-grid">{photos.gallery.length > 0 ? photos.gallery.map((photo, index) => <div className="vv-gallery-photo" key={photo}><img src={photo} alt={`A moment with ${details.bride} and ${details.groom} ${index + 1}`} /><span>{String(index + 1).padStart(2, "0")}</span></div>) : <><div className="vv-gallery-photo photo-one"><span>01</span></div><div className="vv-gallery-photo photo-two"><span>02</span></div><div className="vv-gallery-photo photo-three"><span>03</span></div><div className="vv-gallery-photo photo-four"><span>04</span></div></>}</div></section>
 
-    <section className="vv-rsvp"><div className="vv-rsvp-inner"><p className="vv-overline">Will you be there?</p><h2>We hope you&apos;ll<br /><em>say yes</em></h2><p>Kindly let us know if we can save you a seat at our celebration.</p><div className="vv-rsvp-actions"><a className="vv-button vv-button-light" href={`tel:${details.rsvp}`}>RSVP now <span>→</span></a><a className="vv-share" href={`https://wa.me/?text=${shareMessage}`} target="_blank" rel="noreferrer">◌ Share on WhatsApp</a></div></div></section>
+    <section className="vv-rsvp"><div className="vv-rsvp-inner"><p className="vv-overline">Will you be there?</p><h2>We hope you&apos;ll<br /><em>say yes</em></h2><p>Kindly let us know if we can save you a seat at our celebration.</p><div className="vv-rsvp-actions"><a className="vv-button vv-button-light" href={`tel:${details.rsvp}`}>RSVP now <span>→</span></a>{privatePreview ? <span className="vv-share">Private preview</span> : <a className="vv-share" href={`https://wa.me/?text=${shareMessage}`} target="_blank" rel="noreferrer">◌ Share on WhatsApp</a>}</div></div></section>
 
     <footer className="vv-footer"><Ornament /><p>With love and gratitude</p><h2>{details.bride} <em>&</em> {details.groom}</h2><span>{formatDate(details.date)}</span><a href="#top" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>Back to top ↑</a></footer>
   </main>;

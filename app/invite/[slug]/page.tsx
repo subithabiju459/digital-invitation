@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import { createAdminClient } from "@/utils/supabase/admin";
-import { isInvitationExpired } from "@/lib/invitation-expiry";
+import { publicInvitationAccess } from "@/lib/invitation-access";
 import VelvetVowsInvitation, {
   type VelvetVowsDetails,
   type VelvetVowsPhotos,
@@ -24,7 +24,9 @@ export default async function InvitationPage({
     .single();
 
   if (error || !data) notFound();
-  if (isInvitationExpired(data.wedding_date, data.wedding_time)) {
+  const access = publicInvitationAccess({ status: data.status, weddingDate: data.wedding_date, weddingTime: data.wedding_time });
+  if (access === "unavailable") notFound();
+  if (access === "expired") {
     return <ExpiredInvitation />;
   }
 

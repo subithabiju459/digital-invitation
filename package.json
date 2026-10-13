@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "node --test tests/invitation-expiry.test.ts"
+    "test": "node --test tests/invitation-expiry.test.ts tests/draft-preview.test.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
